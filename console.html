@@ -1,0 +1,125 @@
+<!--
+SQittle SQL Engine in JavaScript
+Copyright 2011 Moxley Stratton
+MIT License - See LICENSE
+-->
+<html>
+<head>
+    <title>SQittle SQL Engine in JavaScript</title>
+    <script type="text/javascript" src="sqittle.js"></script>
+    <script type="text/javascript">
+    window.onload = function () {
+        window.sql = new SQittle();
+        window.inputEl = document.getElementById('input');
+        window.outputEl = document.getElementById('output');
+        window.inputEl.value = "";
+        window.outputEl.value = "";
+        window.inputEl.value = "CREATE TABLE product (\n" +
+            "    id int,\n" +
+            "    title varchar,\n" +
+            "    price float\n" +
+            ");\n" +
+            "INSERT INTO product (id, title, price) " +
+            "VALUES (1, 'Test Product', 5.25);\n" +
+            "INSERT INTO product (id, title, price) " +
+            "VALUES (2, 'Best Product', 9.99);\n" +
+            "SELECT * FROM product;";
+        execute();
+    };
+    function execute() {
+        var sqlText, result
+        sqlText = window.inputEl.value;
+        try {
+            result = window.sql.execute(sqlText, true);
+            output(result.output + "\n");
+            window.inputEl.value = "";
+        }
+        catch (e) {
+            output(e.message + "\n\n");
+        }
+        window.inputEl.focus();
+    }
+    function clear() {
+        window.outputEl.value = "";
+    }
+    function output(str) {
+        var t = window.outputEl;
+        t.value += str;
+        t.scrollTop = t.scrollHeight;
+    }
+    function help() {
+        window.inputEl.value = "HELP";
+        execute();
+    }
+    function about() {
+        window.inputEl.value = "ABOUT";
+        execute();
+    }
+    </script>
+    <style type="text/css">
+    * {font-family: Arial, Helvetica, sans-serif;}
+    textarea, pre, input[type="text"] {font-family: monospace;}
+    #content {margin: 40px auto 0; width: 681px;}
+    .titleBar {background-color: #ccc; overflow: auto; padding: 2px 3px;}
+    .titleBar .title {float: left;}
+    .titleBar .buttons {float: right;}
+    .output {margin-top: 5px;}
+    #output, .input .prompt, #input {
+        background-color: #000;
+    }
+    #output {
+        border: 0;
+        color: #aaa;
+        font-size: 14px;
+        height: 300px;
+        margin: 0;
+        padding: 2px 4px;
+        width: 100%;
+    }
+    .input {width: 100%;}
+    .input .prompt  {
+        color: #aaa;
+        padding: 2px 4px;
+        width: 10px;
+    }
+    .input .text {}
+    #input {
+        border: 0;
+        color: #aaa;
+        display: block;
+        font-size: 14px;
+        height: 23px;
+        padding: 2px;
+        width: 100%;
+    }
+    .execute {text-align: center; width: 100%;}
+    #executeBtn {height: 30px; margin-top: 5px; width: 100px;}
+    </style>
+</head>
+<body>
+
+    <form action="javascript:;" id="content">
+        <div class="output">
+            <div class="titleBar">
+                <div class="title">SQittle</div>
+                <div class="buttons">
+                    <a href="javascript:help()">help</a>
+                    <a href="javascript:about()">about</a>
+                </div>
+            </div>
+            <textarea id="output"></textarea>
+        </div>
+
+        <table class="input" cellspacing="0" cellpadding="0">
+            <tr>
+                <td class="prompt">&gt;</td>
+                <td><input type="text" id="input" class="text"/></td>
+        </table>
+
+        <div class="execute" style="display:none">
+            <button onclick="execute()" id="executeBtn">Execute</button>
+        </div>
+    </form>
+
+</body>
+</html>
