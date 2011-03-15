@@ -11,6 +11,7 @@ MIT License - See LICENSE
     window.onload = function () {
         window.sql = new SQittle();
         window.inputEl = document.getElementById('input');
+        window.inputEl.onkeypress = onInputKeyPress;
         window.outputEl = document.getElementById('output');
         window.inputEl.value = "";
         window.outputEl.value = "";
@@ -55,6 +56,11 @@ MIT License - See LICENSE
         window.inputEl.value = "ABOUT";
         execute();
     }
+    function onInputKeyPress(e) {
+        if (e.keyCode === 13) {
+            execute();
+        }
+    }
     </script>
     <style type="text/css">
     * {font-family: Arial, Helvetica, sans-serif;}
@@ -94,7 +100,7 @@ MIT License - See LICENSE
         padding: 2px;
         width: 100%;
     }
-    #executeBtn {width: 100%;}</style>
+    </style>
 </head>
 <body>
 
@@ -116,7 +122,6 @@ MIT License - See LICENSE
                 <td><input type="text" id="input" class="text"/></td>
         </table>
 
-        <input type="submit" onclick="execute()" id="executeBtn" value="Execute"/>
     </form>
 
 </body>
