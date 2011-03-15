@@ -5,10 +5,14 @@
  * About - See README.md
  */
 
-/*jslint evil: true, maxerr: 50, indent: 4 */
+/*jslint maxerr: 50, indent: 4 */
 
 function SQLTokenizer() {
-    var buf = '', pos = 0, linePositions = [], delimiters = ',();', lastCh = null;
+    var buf = '',
+        pos = 0,
+        linePositions = [],
+        delimiters = ',();',
+        lastCh = null;
 
     function eof() {
         return pos >= buf.length;
@@ -263,7 +267,7 @@ function SQLTokenizer() {
 }
 
 function SQLStatementParser() {
-    var tokenizer, token, parser;
+    var tokenizer, token, parser, methods;
     
     parser = this;
     tokenizer = new SQLTokenizer();
@@ -614,17 +618,15 @@ function SQLStatementParser() {
         fName = 'parse' +
             command.substr(0, 1) + 
             command.substr(1).toLowerCase();
-        try {
-            func = eval(fName);
-        }
-        catch (e) {
+
+        if (!methods[fName]) {
             throw new ParseError("Unknown SQL command, '" + command + "'");
         }
         
-        return func();
+        return methods[fName]();
     }
     
-    return {
+    methods = {
         parseAND: function (buf) {
             parser.setBuffer(buf);
             return parseAND();
@@ -633,6 +635,14 @@ function SQLStatementParser() {
             parser.setBuffer(buf);
             return parseOR();
         },
+        parseCreate: parseCreate,
+        parseDump:   parseDump,
+        parseInsert: parseInsert,
+        parseUpdate: parseUpdate,
+        parseDelete: parseDelete,
+        parseSelect: parseSelect,
+        parseHelp:   parseHelp,
+        parseAbout:  parseAbout,
         setBuffer: function (buf) {
             tokenizer.setBuffer(buf);
             token = undefined;
@@ -644,10 +654,12 @@ function SQLStatementParser() {
             return parse();
         }
     };
+    
+    return methods;
 }
 
 function SQittle() {
-    var tables = [], rowMatches;
+    var tables = [], rowMatches, methods;
 
     function ExecuteError(msg, command) {
         var message;
@@ -1009,7 +1021,7 @@ function SQittle() {
                 "                               Moxley Stratton\n" +
                 "                                 MIT License\n" +
                 "                      https://github.com/moxley/sqittle\n"
-        }
+        };
     }
     
     function executeHelp() {
@@ -1032,14 +1044,11 @@ function SQittle() {
             stmt.command.substr(0, 1).toUpperCase() + 
             stmt.command.substr(1).toLowerCase();
         
-        try {
-            func = eval(fName);
-        }
-        catch (e) {
+        if (!methods[fName]) {
             throw new ExecuteError("Unknown command: '" + stmt.command + "'");
         }
         
-        return func(stmt);
+        return methods[fName](stmt);
     }
 
     function executeSQL(sql, formatted) {
@@ -1076,12 +1085,22 @@ function SQittle() {
         return res;
     }
 
-    return {
+    methods = {
         execute: function (sql, formatted) {
             return executeSQL(sql, formatted);
         },
+        executeCreate: executeCreate,
+        executeDump:   executeDump,
+        executeInsert: executeInsert,
+        executeUpdate: executeUpdate,
+        executeDelete: executeDelete,
+        executeSelect: executeSelect,
+        executeAbout:  executeAbout,
+        executeHelp:   executeHelp,
         dump: function () {
             return dump();
         }
     };
+    
+    return methods;
 }

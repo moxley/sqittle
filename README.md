@@ -14,8 +14,7 @@ core JavaScript, so it is completely portable. It also uses no input or output.
 
 The console.html file provides the user interface.
 
-SQittle follows all JSLint guidelines except for two, small instances of
-eval().
+SQittle follows all JSLint guidelines.
 
 What is Supported
 =================
