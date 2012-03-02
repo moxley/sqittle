@@ -355,6 +355,29 @@ function SQLStatementParser() {
             throw new ParseError("Unknown entity type for CREATE: " + token.value);
         }
     }
+
+    function parseShowTables() {
+        next();
+        skipEndOfStatement();
+        return {
+            command: 'SHOW',
+            what: 'TABLES'
+        };
+    }
+
+    function parseShow() {
+        next();
+        if (token.type !== 'iden') {
+            throw new ParseError("Expected identifier after DUMP, got: " + token.type);
+        }
+
+        if (token.value.toUpperCase() === 'TABLES') {
+            return parseShowTables();
+        }
+        else {
+            throw new ParseError("Unknown entity type for SHOW: " + token.value);
+        }
+    }
     
     function parseDumpTable() {
         var tableName, line;
@@ -636,6 +659,7 @@ function SQLStatementParser() {
             return parseOR();
         },
         parseCreate: parseCreate,
+        parseShow:   parseShow,
         parseDump:   parseDump,
         parseInsert: parseInsert,
         parseUpdate: parseUpdate,
@@ -789,6 +813,34 @@ function SQittle() {
         return {
             output: dumpTable(table)
         };
+    }
+
+    function executeShowTables(stmt) {
+        var rows = [], out;
+        for (i = 0; i < tables.length; i += 1) {
+            rows.push([tables[i].name]);
+        }
+
+        out = formatRows(['table'], rows);
+        if (rows.length == 1) {
+            out += rows.length + " table";
+        }
+        else {
+            out += rows.length + " tables";
+        }
+
+        return {
+            output: out
+        };
+    }
+
+    function executeShow(stmt) {
+        if (stmt.what === 'TABLES') {
+            return executeShowTables(stmt);
+        }
+        else {
+            throw new ExecuteError("Don't know how to show '" + stmt.what + "'", stmt);
+        }
     }
 
     function executeDump(stmt) {
@@ -1033,6 +1085,7 @@ function SQittle() {
                 "INSERT INTO [table] ([cols]) VALUES ([values])\n" +
                 "UPDATE [table] SET [assignments] WHERE [conditions]\n" +
                 "SELECT [cols] FROM [table] WHERE [conditions]\n" +
+                "SHOW TABLES\n" +
                 "DUMP TABLE [table]\n"
         };
     }
@@ -1090,6 +1143,7 @@ function SQittle() {
             return executeSQL(sql, formatted);
         },
         executeCreate: executeCreate,
+        executeShow:   executeShow,
         executeDump:   executeDump,
         executeInsert: executeInsert,
         executeUpdate: executeUpdate,
