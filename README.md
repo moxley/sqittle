@@ -20,6 +20,7 @@ What is Supported
 =================
  * CREATE TABLE
  * DUMP TABLE (dump to SQL)
+ * SHOW TABLES
  * INSERT
  * UPDATE
  * DELETE
